@@ -1,0 +1,32 @@
+image: maven:3-openjdk-17
+
+variables:
+  MAVEN_CLI_OPTS: >-
+    --batch-mode
+    --errors
+    --fail-at-end
+    --show-version
+    --no-transfer-progress
+    -DinstallAtEnd=true
+    -DdeployAtEnd=true
+
+cache:
+  paths:
+    - .m2/repository
+
+workflow:
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+    - if: '$CI_COMMIT_TAG'
+    - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
+
+.verify:
+  stage: test
+  tags:
+    - k8s-internal
+  script:
+    - 'mvn $MAVEN_CLI_OPTS verify'
+
+verify:
+  extends:
+    - .verify
