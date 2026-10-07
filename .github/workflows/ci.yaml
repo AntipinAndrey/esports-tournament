@@ -1,4 +1,4 @@
-name: Maven verification
+name: Run Maven tests
 
 on:
   push:
@@ -6,7 +6,8 @@ on:
   workflow_dispatch:
 
 jobs:
-  verify:
+  test:
+    name: Run unit tests
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -17,5 +18,5 @@ jobs:
           distribution: temurin
           java-version: '17'
           cache: maven
-      - name: test
+      - name: Run tests
         run: mvn clean test
