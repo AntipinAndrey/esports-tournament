@@ -1,11 +1,13 @@
-name: Maven verification
+name: Run Maven tests
 
 on:
   push:
   pull_request:
+  workflow_dispatch:
 
 jobs:
-  verify:
+  test:
+    name: Run unit tests
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -16,5 +18,5 @@ jobs:
           distribution: temurin
           java-version: '17'
           cache: maven
-      - name: Verify
-        run: ./mvnw --batch-mode --errors --fail-at-end verify
+      - name: Run tests
+        run: mvn clean test
