@@ -1,11 +1,48 @@
 package com.example.demo.model;
 
-/*Игрок команды. Связь Team 1:N Player хранится в классе Team.*/
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
+import lombok.AccessLevel;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
+
+/* Игрок команды. Nickname используется как естественный ключ. */
+@Entity
+@Table(name = "players")
+@Getter
+@Setter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@EqualsAndHashCode(callSuper = false, onlyExplicitlyIncluded = true)
+@ToString(onlyExplicitlyIncluded = true)
 public class Player extends User {
-    private final String nickname;
-    private final String firstName;
-    private final String lastName;
-    private final String email;
+    @Id
+    @jakarta.persistence.Column(length = 100)
+    @EqualsAndHashCode.Include
+    @ToString.Include
+    private String nickname;
+
+    @jakarta.persistence.Column(nullable = false, length = 100)
+    @ToString.Include
+    private String firstName;
+
+    @jakarta.persistence.Column(nullable = false, length = 100)
+    @ToString.Include
+    private String lastName;
+
+    @jakarta.persistence.Column(nullable = false, unique = true, length = 255)
+    @ToString.Include
+    private String email;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "team_name")
+    private Team team;
 
     public Player(
             String nickname,
@@ -23,31 +60,5 @@ public class Player extends User {
     @Override
     public String getRoleDescription() {
         return "Player";
-    }
-
-    public String getNickname() {
-        return nickname;
-    }
-
-    public String getFirstName() {
-        return firstName;
-    }
-
-    public String getLastName() {
-        return lastName;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    @Override
-    public String toString() {
-        return "Player{" +
-                "nickname='" + nickname + '\'' +
-                ", firstName='" + firstName + '\'' +
-                ", lastName='" + lastName + '\'' +
-                ", email='" + email + '\'' +
-                '}';
     }
 }

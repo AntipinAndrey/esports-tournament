@@ -1,13 +1,11 @@
-name: Run Maven tests
+name: Maven verification
 
 on:
   push:
   pull_request:
-  workflow_dispatch:
 
 jobs:
-  test:
-    name: Run unit tests
+  verify:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -19,14 +17,9 @@ jobs:
           distribution: temurin
           java-version: '17'
           cache: maven
-<<<<<<< HEAD:.github/workflows/ci.yaml
-      - name: Run tests
-        run: mvn clean test
-=======
 
       - name: Make Maven Wrapper executable
         run: chmod +x mvnw
 
       - name: Verify
         run: ./mvnw --batch-mode --errors --fail-at-end verify
->>>>>>> 6b87121 (update lab1 fixed Match):.github/workflows/ci.yml

@@ -1,24 +1,71 @@
 package com.example.demo.model;
 
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
+import lombok.AccessLevel;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
+
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-/* Турнир.
- Один организатор может проводить много турниров.
- Список Match представляет связь Турнир M:N Команда.
- */
+/** Турнир. Название используется как естественный ключ. */
+@Entity
+@Table(name = "tournaments")
+@Getter
+@Setter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
+@ToString(onlyExplicitlyIncluded = true)
 public class Tournament {
-    private final String tournamentName;
-    private final String discipline;
-    private final LocalDate startDate;
-    private final LocalDate endDate;
-    private final BigDecimal prizePool;
+    @Id
+    @jakarta.persistence.Column(length = 150)
+    @EqualsAndHashCode.Include
+    @ToString.Include
+    private String tournamentName;
+
+    @jakarta.persistence.Column(nullable = false, length = 100)
+    @ToString.Include
+    private String discipline;
+
+    @jakarta.persistence.Column(nullable = false)
+    @ToString.Include
+    private LocalDate startDate;
+
+    @jakarta.persistence.Column(nullable = false)
+    @ToString.Include
+    private LocalDate endDate;
+
+    @jakarta.persistence.Column(nullable = false, precision = 14, scale = 2)
+    @ToString.Include
+    private BigDecimal prizePool;
+
+    @jakarta.persistence.Column(nullable = false, length = 50)
+    @ToString.Include
     private String status;
-    private final Organizer organizer;
-    private final List<Match> matches = new ArrayList<>();
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "organizer_name", nullable = false)
+    private Organizer organizer;
+
+    @OneToMany(
+            mappedBy = "tournament",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
+    )
+    private List<Match> matches = new ArrayList<>();
 
     public Tournament(
             String tournamentName,
@@ -41,6 +88,7 @@ public class Tournament {
     public void addMatch(Match match) {
         if (!matches.contains(match)) {
             matches.add(match);
+            match.setTournament(this);
         }
     }
 
@@ -52,51 +100,5 @@ public class Tournament {
 
     public List<Match> getMatches() {
         return Collections.unmodifiableList(matches);
-    }
-
-    public String getTournamentName() {
-        return tournamentName;
-    }
-
-    public String getDiscipline() {
-        return discipline;
-    }
-
-    public LocalDate getStartDate() {
-        return startDate;
-    }
-
-    public LocalDate getEndDate() {
-        return endDate;
-    }
-
-    public BigDecimal getPrizePool() {
-        return prizePool;
-    }
-
-    public String getStatus() {
-        return status;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
-    }
-
-    public Organizer getOrganizer() {
-        return organizer;
-    }
-
-    @Override
-    public String toString() {
-        return "Tournament{" +
-                "tournamentName='" + tournamentName + '\'' +
-                ", discipline='" + discipline + '\'' +
-                ", startDate=" + startDate +
-                ", endDate=" + endDate +
-                ", prizePool=" + prizePool +
-                ", status='" + status + '\'' +
-                ", organizer='" + organizer.getOrganizerName() + '\'' +
-                ", matches=" + matches.size() +
-                '}';
     }
 }

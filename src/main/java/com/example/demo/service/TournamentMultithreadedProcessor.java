@@ -10,7 +10,11 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
-
+/**
+ * Обрабатывает одну коллекцию команд в нескольких потоках.
+ * Названия потоков видны в консоли, поэтому выполнение легко показать
+ * преподавателю на защите лабораторной работы.
+ */
 public class TournamentMultithreadedProcessor {
 
     public List<String> processTeams(List<Team> teams) {

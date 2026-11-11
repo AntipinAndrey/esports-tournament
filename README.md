@@ -1,141 +1,83 @@
-# Лабораторная работа №1 Тема: Базовые типы данных. Создание собственных классов.
-Проект: Esports Tournament - Сервис организации киберспортивного турнира
+# Система управления киберспортивными турнирами (Lab 2)
 
-## Основная функциональность
+## Описание проекта
 
-- создание и хранение турниров в `ArrayList`;
-- поиск турнира по названию;
-- поиск турниров по статусу;
-- изменение статуса турнира;
-- удаление турнира;
-- добавление матча к турниру;
-- добавление игроков в состав команды;
-- описание ролей пользователей через абстрактный класс и наследование;
-- многопоточная обработка коллекции команд;
-- вывод имён потоков в консоль;
-- проверка бизнес-логики unit-тестами;
-- автоматический запуск тестов через GitHub Actions и GitLab CI.
+REST-сервис для управления киберспортивными турнирами, командами, игроками,
+организаторами и матчами. Проект разработан на Java с использованием Spring
+Boot, Spring Data JPA и PostgreSQL. Реализован паттерн MVC.
 
-## Модель предметной области
+## Пакеты проекта
 
-Проект основан на ER-диаграмме:
+- `model` — JPA-сущности предметной области;
+- `dto` — DTO-объекты для запросов и ответов API с валидацией;
+- `repository` — интерфейсы Spring Data JPA;
+- `service` — бизнес-логика: интерфейсы и реализации `ServiceImpl`;
+- `controller` — REST-контроллеры;
+- `src/test` — тесты Spring Boot, Mockito и MockMvc.
 
-```text
-Организатор 1:N Турнир
-Турнир M:N Команда через Матч
-Команда 1:N Игрок
-```
+## REST API
 
-### `Organizer` — организатор
+### Организаторы (`/api/organizers`)
 
-Поля класса соответствуют сущности «Организатор»:
+- `POST /api/organizers` — создать организатора;
+- `PUT /api/organizers/{organizerName}` — обновить организатора;
+- `GET /api/organizers` — получить всех организаторов;
+- `GET /api/organizers/{organizerName}` — получить организатора;
+- `GET /api/organizers?country={country}` — фильтр по стране;
+- `DELETE /api/organizers/{organizerName}` — удалить организатора.
 
-- `organizerName` — имя организатора;
-- `email` — электронная почта;
-- `phoneNumber` — номер телефона;
-- `country` — страна.
+### Команды (`/api/teams`)
 
-### `Tournament` — турнир
+- `POST /api/teams` — создать команду;
+- `PUT /api/teams/{teamName}` — обновить команду;
+- `GET /api/teams` — получить все команды;
+- `GET /api/teams/{teamName}` — получить команду;
+- `GET /api/teams?country={country}` — фильтр по стране;
+- `DELETE /api/teams/{teamName}` — удалить команду.
 
-Поля класса соответствуют сущности «Турнир»:
+### Игроки (`/api/players`)
 
-- `tournamentName` — название турнира;
-- `discipline` — игровая дисциплина;
-- `startDate` — дата начала;
-- `endDate` — дата окончания;
-- `prizePool` — призовой фонд;
-- `status` — текущий статус;
-- `organizer` — организатор турнира;
-- `matches` — список матчей турнира.
+- `POST /api/players` — создать игрока;
+- `PUT /api/players/{nickname}` — обновить игрока;
+- `GET /api/players` — получить всех игроков;
+- `GET /api/players/{nickname}` — получить игрока;
+- `GET /api/players?teamName={teamName}` — фильтр по команде;
+- `GET /api/players?firstName={firstName}` — фильтр по имени;
+- `DELETE /api/players/{nickname}` — удалить игрока.
 
-### `Team` — команда
+### Турниры (`/api/tournaments`)
 
-Поля класса соответствуют сущности «Команда»:
+- `POST /api/tournaments` — создать турнир;
+- `PUT /api/tournaments/{tournamentName}` — обновить турнир;
+- `GET /api/tournaments` — получить все турниры;
+- `GET /api/tournaments/{tournamentName}` — получить турнир;
+- `GET /api/tournaments?status={status}` — фильтр по статусу;
+- `GET /api/tournaments?discipline={discipline}` — фильтр по дисциплине;
+- `DELETE /api/tournaments/{tournamentName}` — удалить турнир.
 
-- `teamName` — название команды;
-- `tag` — короткий тег команды;
-- `country` — страна;
-- `rating` — рейтинг;
-- `players` — список игроков команды.
+### Матчи (`/api/matches`)
 
-### `Player` — игрок
+- `POST /api/matches` — создать матч;
+- `PUT /api/matches/{tournamentName}/{firstTeamName}/{secondTeamName}` — обновить матч;
+- `GET /api/matches` — получить матчи;
+- `GET /api/matches/{tournamentName}/{firstTeamName}/{secondTeamName}` — получить матч;
+- `GET /api/matches?tournamentName={tournamentName}` — фильтр по турниру;
+- `GET /api/matches?teamName={teamName}` — фильтр по команде;
+- `GET /api/matches?winnerName={winnerName}` — фильтр по победителю;
+- `DELETE /api/matches/{tournamentName}/{firstTeamName}/{secondTeamName}` — удалить матч.
 
-Поля класса соответствуют сущности «Игрок»:
+## Технологии
 
-- `nickname` — игровой псевдоним;
-- `firstName` — имя;
-- `lastName` — фамилия;
-- `email` — электронная почта.
+- Java 17;
+- Spring Boot 3.4.4;
+- Spring MVC;
+- Spring Data JPA;
+- PostgreSQL;
+- Lombok;
+- H2 для тестов;
+- Mockito, `@SpringBootTest` и MockMvc;
+- Maven.
 
-### `Match` — матч
-
-`Match` представляет связь между турниром и командой.
-
-Поля связи:
-
-- `team` — команда;
-- `score` — счёт;
-- `winnerName` — название победителя.
-
-
-## Роли пользователей
-
-В задании лабораторной работы требуется заранее подготовить роли, поэтому в
-проекте есть:
-
-- `User` — абстрактный базовый класс пользователя;
-- `UserRole` — перечисление ролей;
-- `AdminUser` — администратор;
-- `Organizer` — пользователь с ролью `ORGANIZER`;
-- `Player` — пользователь с ролью `PLAYER`.
-
-
-
-## Пакет `model`
-
-Содержит классы предметной области и связи между ними.
-
-Модели отвечают только за хранение данных и простые операции со своими
-коллекциями:
-
-- `Team.addPlayer()` добавляет игрока в команду;
-- `Team.removePlayer()` удаляет игрока;
-- `Tournament.addMatch()` добавляет матч в турнир;
-- `Tournament.removeMatch()` удаляет матч.
-
-## Пакет `service`
-
-### `TournamentStorage`
-
-Интерфейс хранилища турниров.
-
-Он описывает операции:
-
-- добавление турнира;
-- получение всех турниров;
-- поиск по названию;
-- поиск по статусу;
-- изменение статуса;
-- удаление турнира;
-- добавление матча.
-
-### `TournamentStorageImpl`
-
-Реализация `TournamentStorage` на основе `ArrayList`.
-
-Класс проверяет дубликаты, ищет объекты, изменяет статус и удаляет турниры.
-
-### `TournamentMultithreadedProcessor`
-
-Обрабатывает список команд с помощью `ExecutorService`.
-
-## Пакет `test`
-
-Содержит unit-тесты:
-
-- `DemoApplicationTests` — проверяет запуск Spring-контекста;
-- `ModelTest` — проверяет роли, игроков команды и матчи турнира;
-- `TournamentStorageTest` — проверяет добавление, поиск, изменение, удаление
-  и защиту от дубликатов;
-- `TournamentMultithreadedProcessorTest` — проверяет многопоточную обработку
-  команд и имена потоков.
+Схема таблиц создаётся Hibernate на основе JPA-аннотаций при запуске приложения.
+Тесты используют изолированную H2-базу и не подключаются к пользовательской
+базе PostgreSQL.

@@ -8,7 +8,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-
+/**
+ * Простая реализация хранилища на ArrayList.
+ * Для первой лабораторной работы база данных пока не используется.
+ */
 @Service
 public class TournamentStorageImpl implements TournamentStorage {
     private final List<Tournament> tournaments = new ArrayList<>();

@@ -82,6 +82,13 @@ class ModelTest {
         assertThat(match.getFirstTeam()).isSameAs(firstTeam);
         assertThat(match.getSecondTeam()).isSameAs(secondTeam);
         assertThat(match.getWinnerName()).isEqualTo("Team Spirit");
+        assertThat(match.getWinner()).isSameAs(firstTeam);
+        assertThat(match.calculatePoints())
+                .containsEntry("Team Spirit", 2)
+                .containsEntry("Team Liquid", 1);
+        assertThat(match.getWinnerPoints()).isEqualTo(2);
+        assertThat(match.getWinnerWithScore())
+                .isEqualTo("Team Spirit — счёт 2:1");
 
         match.printWinner();
 
