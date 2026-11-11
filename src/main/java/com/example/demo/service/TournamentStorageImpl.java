@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-/* Реализация хранилища на ArrayList.*/
+
 @Service
 public class TournamentStorageImpl implements TournamentStorage {
     private final List<Tournament> tournaments = new ArrayList<>();

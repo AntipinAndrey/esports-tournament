@@ -6,7 +6,7 @@ import com.example.demo.model.Tournament;
 import java.util.List;
 import java.util.Optional;
 
-/* Интерфейс хранилища турниров. */
+
 public interface TournamentStorage {
     void addTournament(Tournament tournament);
 

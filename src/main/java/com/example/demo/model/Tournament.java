@@ -6,7 +6,10 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-
+/* Турнир.
+ Один организатор может проводить много турниров.
+ Список Match представляет связь Турнир M:N Команда.
+ */
 public class Tournament {
     private final String tournamentName;
     private final String discipline;
@@ -42,7 +45,9 @@ public class Tournament {
     }
 
     public void removeMatch(String teamName) {
-        matches.removeIf(match -> match.getTeam().getTeamName().equals(teamName));
+        matches.removeIf(match ->
+                match.getFirstTeam().getTeamName().equals(teamName)
+                        || match.getSecondTeam().getTeamName().equals(teamName));
     }
 
     public List<Match> getMatches() {

@@ -67,11 +67,25 @@ class ModelTest {
                 "planned",
                 organizer
         );
-        Team team = new Team("Team Spirit", "TS", "Russia", 1500);
-        Match match = new Match(team, "2:1", "Team Spirit");
+        Team firstTeam = new Team("Team Spirit", "TS", "Russia", 1500);
+        Team secondTeam = new Team("Team Liquid", "TL", "Netherlands", 1450);
+        Match match = new Match(
+                firstTeam,
+                secondTeam,
+                "2:1",
+                "Team Spirit"
+        );
 
         tournament.addMatch(match);
 
         assertThat(tournament.getMatches()).containsExactly(match);
+        assertThat(match.getFirstTeam()).isSameAs(firstTeam);
+        assertThat(match.getSecondTeam()).isSameAs(secondTeam);
+        assertThat(match.getWinnerName()).isEqualTo("Team Spirit");
+
+        match.printWinner();
+
+        tournament.removeMatch("Team Liquid");
+        assertThat(tournament.getMatches()).isEmpty();
     }
 }

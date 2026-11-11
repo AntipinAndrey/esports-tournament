@@ -1,6 +1,6 @@
 package com.example.demo.model;
 
-
+/*Игрок команды. Связь Team 1:N Player хранится в классе Team.*/
 public class Player extends User {
     private final String nickname;
     private final String firstName;
