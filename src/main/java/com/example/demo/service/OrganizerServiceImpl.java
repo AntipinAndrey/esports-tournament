@@ -2,6 +2,9 @@ package com.example.demo.service;
 
 import com.example.demo.dto.OrganizerRequest;
 import com.example.demo.dto.OrganizerResponse;
+import com.example.demo.exception.DuplicateResourceException;
+import com.example.demo.exception.InvalidRequestException;
+import com.example.demo.exception.ResourceNotFoundException;
 import com.example.demo.model.Organizer;
 import com.example.demo.repository.OrganizerRepository;
 import lombok.RequiredArgsConstructor;
@@ -33,7 +36,10 @@ public class OrganizerServiceImpl implements OrganizerService {
     @Transactional
     public OrganizerResponse create(OrganizerRequest request) {
         if (organizerRepository.existsById(request.organizerName())) {
-            throw new IllegalStateException("Organizer already exists");
+            throw new DuplicateResourceException(
+                    "Organizer already exists: " + request.organizerName(),
+                    "Use another organizerName or update the existing organizer with PUT."
+            );
         }
         Organizer organizer = new Organizer(
                 request.organizerName(),
@@ -52,8 +58,9 @@ public class OrganizerServiceImpl implements OrganizerService {
     ) {
         Organizer organizer = getOrganizer(organizerName);
         if (!organizerName.equals(request.organizerName())) {
-            throw new IllegalArgumentException(
-                    "Path organizerName must match request organizerName"
+            throw new InvalidRequestException(
+                    "Path organizerName must match request organizerName",
+                    "Use the same organizerName in the URL and in the JSON body."
             );
         }
         organizer.setEmail(request.email());
@@ -72,7 +79,8 @@ public class OrganizerServiceImpl implements OrganizerService {
     private Organizer getOrganizer(String organizerName) {
         return organizerRepository.findById(organizerName)
                 .orElseThrow(() -> new ResourceNotFoundException(
-                        "Organizer not found: " + organizerName
+                        "Organizer not found: " + organizerName,
+                        "Check organizerName or first send GET /api/organizers to see available organizers."
                 ));
     }
 

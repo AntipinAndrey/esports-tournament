@@ -2,6 +2,9 @@ package com.example.demo.service;
 
 import com.example.demo.dto.PlayerRequest;
 import com.example.demo.dto.PlayerResponse;
+import com.example.demo.exception.DuplicateResourceException;
+import com.example.demo.exception.InvalidRequestException;
+import com.example.demo.exception.ResourceNotFoundException;
 import com.example.demo.model.Player;
 import com.example.demo.model.Team;
 import com.example.demo.repository.PlayerRepository;
@@ -41,7 +44,10 @@ public class PlayerServiceImpl implements PlayerService {
     @Transactional
     public PlayerResponse create(PlayerRequest request) {
         if (playerRepository.existsById(request.nickname())) {
-            throw new IllegalStateException("Player already exists");
+            throw new DuplicateResourceException(
+                    "Player already exists: " + request.nickname(),
+                    "Use another nickname or update the existing player with PUT."
+            );
         }
         Player player = new Player(
                 request.nickname(),
@@ -58,8 +64,9 @@ public class PlayerServiceImpl implements PlayerService {
     public PlayerResponse update(String nickname, PlayerRequest request) {
         Player player = getPlayer(nickname);
         if (!nickname.equals(request.nickname())) {
-            throw new IllegalArgumentException(
-                    "Path nickname must match request nickname"
+            throw new InvalidRequestException(
+                    "Path nickname must match request nickname",
+                    "Use the same nickname in the URL and in the JSON body."
             );
         }
         player.setFirstName(request.firstName());
@@ -82,7 +89,8 @@ public class PlayerServiceImpl implements PlayerService {
         }
         Team team = teamRepository.findById(teamName)
                 .orElseThrow(() -> new ResourceNotFoundException(
-                        "Team not found: " + teamName
+                        "Team not found: " + teamName,
+                        "Check teamName or first send GET /api/teams to see available teams."
                 ));
         player.setTeam(team);
     }
@@ -90,7 +98,8 @@ public class PlayerServiceImpl implements PlayerService {
     private Player getPlayer(String nickname) {
         return playerRepository.findById(nickname)
                 .orElseThrow(() -> new ResourceNotFoundException(
-                        "Player not found: " + nickname
+                        "Player not found: " + nickname,
+                        "Check nickname or first send GET /api/players to see available players."
                 ));
     }
 

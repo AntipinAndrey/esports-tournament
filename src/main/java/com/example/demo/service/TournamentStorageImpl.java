@@ -1,5 +1,8 @@
 package com.example.demo.service;
 
+import com.example.demo.exception.DuplicateResourceException;
+import com.example.demo.exception.InvalidRequestException;
+import com.example.demo.exception.ResourceNotFoundException;
 import com.example.demo.model.Match;
 import com.example.demo.model.Tournament;
 import org.springframework.stereotype.Service;
@@ -19,10 +22,16 @@ public class TournamentStorageImpl implements TournamentStorage {
     @Override
     public void addTournament(Tournament tournament) {
         if (tournament == null) {
-            throw new IllegalArgumentException("Tournament cannot be null");
+            throw new InvalidRequestException(
+                    "Tournament cannot be null",
+                    "Pass a fully initialized tournament object."
+            );
         }
         if (findTournament(tournament.getTournamentName()).isPresent()) {
-            throw new IllegalStateException("Tournament already exists");
+            throw new DuplicateResourceException(
+                    "Tournament already exists: " + tournament.getTournamentName(),
+                    "Use another tournament name."
+            );
         }
         tournaments.add(tournament);
     }
@@ -67,8 +76,9 @@ public class TournamentStorageImpl implements TournamentStorage {
 
     private Tournament getExistingTournament(String tournamentName) {
         return findTournament(tournamentName)
-                .orElseThrow(() -> new IllegalArgumentException(
-                        "Tournament not found"
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Tournament not found: " + tournamentName,
+                        "Check the tournament name before changing, deleting or adding a match."
                 ));
     }
 }

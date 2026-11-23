@@ -1,5 +1,6 @@
 package com.example.demo.service;
 
+import com.example.demo.exception.DuplicateResourceException;
 import com.example.demo.model.Organizer;
 import com.example.demo.model.Tournament;
 import org.junit.jupiter.api.BeforeEach;
@@ -47,7 +48,7 @@ class TournamentStorageTest {
 
         assertThatThrownBy(() -> storage.addTournament(
                 createTournament("Same Cup", "planned")
-        )).isInstanceOf(IllegalStateException.class);
+        )).isInstanceOf(DuplicateResourceException.class);
     }
 
     private Tournament createTournament(String name, String status) {

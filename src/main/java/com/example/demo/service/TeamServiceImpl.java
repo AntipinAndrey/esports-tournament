@@ -2,6 +2,9 @@ package com.example.demo.service;
 
 import com.example.demo.dto.TeamRequest;
 import com.example.demo.dto.TeamResponse;
+import com.example.demo.exception.DuplicateResourceException;
+import com.example.demo.exception.InvalidRequestException;
+import com.example.demo.exception.ResourceNotFoundException;
 import com.example.demo.model.Team;
 import com.example.demo.repository.TeamRepository;
 import lombok.RequiredArgsConstructor;
@@ -33,7 +36,10 @@ public class TeamServiceImpl implements TeamService {
     @Transactional
     public TeamResponse create(TeamRequest request) {
         if (teamRepository.existsById(request.teamName())) {
-            throw new IllegalStateException("Team already exists");
+            throw new DuplicateResourceException(
+                    "Team already exists: " + request.teamName(),
+                    "Use another teamName or update the existing team with PUT."
+            );
         }
         Team team = new Team(
                 request.teamName(),
@@ -49,8 +55,9 @@ public class TeamServiceImpl implements TeamService {
     public TeamResponse update(String teamName, TeamRequest request) {
         Team team = getTeam(teamName);
         if (!teamName.equals(request.teamName())) {
-            throw new IllegalArgumentException(
-                    "Path teamName must match request teamName"
+            throw new InvalidRequestException(
+                    "Path teamName must match request teamName",
+                    "Use the same teamName in the URL and in the JSON body."
             );
         }
         team.setTag(request.tag());
@@ -68,7 +75,8 @@ public class TeamServiceImpl implements TeamService {
     private Team getTeam(String teamName) {
         return teamRepository.findById(teamName)
                 .orElseThrow(() -> new ResourceNotFoundException(
-                        "Team not found: " + teamName
+                        "Team not found: " + teamName,
+                        "Check teamName or first send GET /api/teams to see available teams."
                 ));
     }
 
